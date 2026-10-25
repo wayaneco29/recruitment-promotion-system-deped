@@ -161,7 +161,7 @@ export default function MobileNavigation() {
             </button>
           </div>
 
-          <div className="px-4 pt-7">
+          <div className="px-4 pt-7 bg-white">
             <p className="px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9aa69f]">
               Workspace
             </p>
@@ -194,7 +194,7 @@ export default function MobileNavigation() {
             </nav>
           </div>
 
-          <div className="mt-auto p-4">
+          <div className="mt-auto p-4 bg-white">
             <div className="rounded-2xl border border-[#e7eee9] bg-[#f8faf8] p-4">
               <div className="flex items-center gap-2 text-[#26734a]">
                 <span aria-hidden="true">◈</span>
