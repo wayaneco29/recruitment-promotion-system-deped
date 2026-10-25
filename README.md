@@ -1,5 +1,32 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Supabase database setup
+
+Apply the database migrations to the linked Supabase project:
+
+```powershell
+supabase link --project-ref <project-ref>
+supabase db push
+```
+
+The migration creates the organization-scoped personnel, submissions, recruitment,
+anonymous evaluation, reporting, notification, and audit tables and enables
+row-level security. Evaluation rules and weights must be configured from the
+approved DepEd policy for each position; the database does not invent scoring
+criteria or make final hiring decisions.
+
+To invite and provision the initial super admin, set `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` in the PowerShell session, then run:
+
+```powershell
+node .\supabase\scripts\invite-super-admin.mjs
+```
+
+The script invites `sdo.8@deped.edu` if no Auth account exists, then calls a
+database function that is executable only by the Supabase `service_role`.
+The invitation is delivered through Supabase Auth; no password is stored in
+the repository. Never expose the service-role key in client-side code.
+
 ## Getting Started
 
 First, run the development server:
