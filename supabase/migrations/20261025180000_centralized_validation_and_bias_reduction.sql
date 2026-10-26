@@ -6,38 +6,6 @@ create type public.organization_unit_type as enum (
   'division'
 );
 
-create or replace function public.user_has_unit_access(p_user_id uuid, p_unit_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  with recursive unit_ancestors(id, parent_id) as (
-    select ou.id, ou.parent_id
-    from public.organization_units ou
-    where ou.id = p_unit_id
-    union all
-    select parent.id, parent.parent_id
-    from public.organization_units parent
-    join unit_ancestors child on child.parent_id = parent.id
-  )
-  select exists (
-    select 1
-    from public.user_roles ur
-    join public.user_profiles up on up.user_id = ur.user_id and up.is_active
-    join unit_ancestors ua on ua.id = ur.organization_unit_id
-    where ur.user_id = p_user_id
-  )
-  or exists (
-    select 1
-    from public.user_roles ur
-    join public.user_profiles up on up.user_id = ur.user_id and up.is_active
-    where ur.user_id = p_user_id
-      and ur.role = 'super_admin'
-  );
-$$;
-
 create type public.app_user_role as enum (
   'teacher',
   'school_personnel',
@@ -367,6 +335,38 @@ create table public.audit_logs (
   details jsonb not null default '{}'::jsonb,
   occurred_at timestamptz not null default now()
 );
+
+create or replace function public.user_has_unit_access(p_user_id uuid, p_unit_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with recursive unit_ancestors(id, parent_id) as (
+    select ou.id, ou.parent_id
+    from public.organization_units ou
+    where ou.id = p_unit_id
+    union all
+    select parent.id, parent.parent_id
+    from public.organization_units parent
+    join unit_ancestors child on child.parent_id = parent.id
+  )
+  select exists (
+    select 1
+    from public.user_roles ur
+    join public.user_profiles up on up.user_id = ur.user_id and up.is_active
+    join unit_ancestors ua on ua.id = ur.organization_unit_id
+    where ur.user_id = p_user_id
+  )
+  or exists (
+    select 1
+    from public.user_roles ur
+    join public.user_profiles up on up.user_id = ur.user_id and up.is_active
+    where ur.user_id = p_user_id
+      and ur.role = 'super_admin'
+  );
+$$;
 
 create index monthly_submissions_queue
   on public.monthly_submissions (organization_unit_id, status, submitted_at);
@@ -1041,7 +1041,7 @@ score_summary as (
   select
     a.id as application_id,
     count(distinct criterion.id) filter (where criterion.is_active) as required_score_count,
-    count(distinct criterion.id) filter (where criterion.is_active and score.score is not null)
+    count(distinct criterion.id) filter (where criterion.is_active and score.average_score is not null)
       as completed_score_count,
     case
       when sum(criterion.weight) filter (where criterion.is_active) > 0 then
@@ -1314,13 +1314,9 @@ using (
 with check (
   public.is_current_user_super_admin()
   or (
-    submitted_by = (select auth.uid())
-    and status in ('draft', 'submitted')
-    and public.has_unit_access(organization_unit_id)
+    public.has_unit_access(organization_unit_id)
     and (
-      public.is_user_in_role('teacher'::public.app_user_role)
-      or public.is_user_in_role('school_personnel'::public.app_user_role)
-      or public.is_user_in_role('school_head'::public.app_user_role)
+      public.is_user_in_role('school_head'::public.app_user_role)
       or public.is_user_in_role('psds'::public.app_user_role)
       or public.is_user_in_role('division_personnel'::public.app_user_role)
     )
@@ -1393,7 +1389,14 @@ using (
     and public.has_unit_access(organization_unit_id)
   )
 )
-with check (public.has_unit_access(organization_unit_id));
+with check (
+  public.is_current_user_super_admin()
+  or (
+    submitted_by = (select auth.uid())
+    and status in ('draft', 'submitted', 'returned')
+    and public.has_unit_access(organization_unit_id)
+  )
+);
 create policy "Administrators can delete monthly submissions"
 on public.monthly_submissions for delete to authenticated
 using (public.is_current_user_super_admin());

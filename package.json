@@ -9,10 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^6.0.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "antd": "^6.6.7",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.91.0",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

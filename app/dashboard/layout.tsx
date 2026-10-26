@@ -1,5 +1,14 @@
 import Image from "next/image";
 import SidebarNavigation from "./sidebar-navigation";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import {
+  DashboardAccountProvider,
+  type DashboardAccount,
+} from "./dashboard-account-context";
+import LogoutButton from "./logout-button";
+
+export const instant = false;
 
 function Icon({
   name,
@@ -92,70 +101,134 @@ function Icon({
   );
 }
 
-export default function Layout({ children }: React.PropsWithChildren) {
+export default async function Layout({ children }: React.PropsWithChildren) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/");
+  }
+
+  const [
+    { data: profile, error: profileError },
+    { data: userRoles, error: rolesError },
+  ] = await Promise.all([
+    supabase
+      .from("user_profiles")
+      .select("full_name, email")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase.from("user_roles").select("role").eq("user_id", user.id),
+  ]);
+
+  if (profileError) {
+    throw new Error(
+      `Unable to load your user profile: ${profileError.message}`,
+    );
+  }
+
+  if (rolesError) {
+    throw new Error(`Unable to load your user roles: ${rolesError.message}`);
+  }
+
+  const displayName: string =
+    profile?.full_name?.trim() ||
+    (typeof user.user_metadata.full_name === "string"
+      ? user.user_metadata.full_name
+      : "") ||
+    user.email ||
+    "User";
+  const roles: string[] = (userRoles ?? []).map(({ role }: { role: string }) =>
+    role
+      .split("_")
+      .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" "),
+  );
+  const account: DashboardAccount = {
+    displayName,
+    email: profile?.email || user.email || "",
+    initials:
+      displayName
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? "")
+        .join("") || "U",
+    roles,
+  };
+
   return (
-    <div className="min-h-screen bg-[#f5f7f6] text-[#172b24]">
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-65 flex-col border-r border-[#e8eeea] bg-white lg:flex">
-        <a href="/dashboard" className="flex h-20 items-center gap-3 px-6">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-[#eaf4ee]">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={32}
-              height={32}
-              className="size-8 object-contain"
-            />
-          </span>
-          <span className="leading-tight">
-            <span className="block text-sm font-bold tracking-tight">
-              DepEd Southern Leyte
+    <DashboardAccountProvider account={account}>
+      <div className="min-h-screen bg-[#f5f7f6] text-[#172b24]">
+        <aside className="fixed inset-y-0 left-0 z-20 hidden w-65 flex-col border-r border-[#e8eeea] bg-white lg:flex">
+          <a href="/dashboard" className="flex h-20 items-center gap-3 px-6">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-[#eaf4ee]">
+              <Image
+                src="/logo.png"
+                alt=""
+                width={32}
+                height={32}
+                className="size-8 object-contain"
+              />
             </span>
-            <span className="mt-1 block text-[11px] font-medium text-[#84938b]">
-              Personnel Management
+            <span className="leading-tight">
+              <span className="block text-sm font-bold tracking-tight">
+                DepEd Southern Leyte
+              </span>
+              <span className="mt-1 block text-[11px] font-medium text-[#84938b]">
+                Personnel Management
+              </span>
             </span>
-          </span>
-        </a>
-        <div className="px-4 pt-7">
-          <p className="px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9aa69f]">
-            Workspace
-          </p>
-          <SidebarNavigation />
-        </div>{" "}
-        <div className="mt-auto p-4">
-          <div className="rounded-2xl border border-[#e7eee9] bg-[#f8faf8] p-4">
-            <div className="flex items-center gap-2 text-[#26734a]">
-              <Icon name="shield" className="size-4" />
-              <span className="text-xs font-bold">Fair review by design</span>
-            </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-[#76857d]">
-              Applicant identities stay concealed during initial screening.
+          </a>
+          <div className="px-4 pt-7">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9aa69f]">
+              Workspace
             </p>
-            <a
-              href="#screening"
-              className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-[#26734a]"
-            >
-              Learn about screening <Icon name="arrow" className="size-3.5" />
-            </a>
-          </div>
-          <div className="mt-4 flex items-center gap-3 border-t border-[#edf0ee] px-2 pt-4">
-            <div className="flex size-9 items-center justify-center rounded-full bg-[#dcebe2] text-xs font-bold text-[#286b46]">
-              AD
+            <SidebarNavigation />
+          </div>{" "}
+          <div className="mt-auto p-4">
+            <div className="rounded-2xl border border-[#e7eee9] bg-[#f8faf8] p-4">
+              <div className="flex items-center gap-2 text-[#26734a]">
+                <Icon name="shield" className="size-4" />
+                <span className="text-xs font-bold">Fair review by design</span>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-[#76857d]">
+                Applicant identities stay concealed during initial screening.
+              </p>
+              <a
+                href="#screening"
+                className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-[#26734a]"
+              >
+                Learn about screening <Icon name="arrow" className="size-3.5" />
+              </a>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-bold">Division Admin</p>
-              <p className="mt-0.5 text-[10px] text-[#84918a]">Administrator</p>
+            <div className="mt-4 border-t border-[#edf0ee] px-2 pt-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#dcebe2] text-xs font-bold text-[#286b46]">
+                  {account.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-bold">
+                    {account.displayName}
+                  </p>
+                  <p className="truncate text-[10px] text-[#84918a]">
+                    {account.roles.join(", ") || "No role assigned"}
+                  </p>
+                  <p className="truncate text-[10px] text-[#84918a]">
+                    {account.email}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3">
+                <LogoutButton />
+              </div>
             </div>
-            <button
-              type="button"
-              aria-label="Open account menu"
-              className="text-[#839088]"
-            >
-              <span className="text-lg leading-none">···</span>
-            </button>
           </div>
-        </div>
-      </aside>
-      <main className="lg:pl-65">{children}</main>
-    </div>
+        </aside>
+        <main className="lg:pl-65">{children}</main>
+      </div>
+    </DashboardAccountProvider>
   );
 }

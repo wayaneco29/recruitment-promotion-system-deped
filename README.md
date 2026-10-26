@@ -24,8 +24,10 @@ node .\supabase\scripts\invite-super-admin.mjs
 
 The script invites `sdo.8@deped.edu` if no Auth account exists, then calls a
 database function that is executable only by the Supabase `service_role`.
-The invitation is delivered through Supabase Auth; no password is stored in
-the repository. Never expose the service-role key in client-side code.
+The migration also grants the role to this account if it already exists when
+the migration runs. Auth credentials are managed separately from migrations;
+no password is stored in the repository. Never expose the service-role key in
+client-side code.
 
 ## Getting Started
 

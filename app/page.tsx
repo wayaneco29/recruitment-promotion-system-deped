@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import LoginForm from "./login-form";
 
 export default function Home() {
   return (
@@ -28,58 +30,26 @@ export default function Home() {
               </div>
 
               <p className="mb-8 text-sm leading-6 text-slate-500">
-                Sign in to access your dashboard, staff tools, and school services.
+                Sign in to access your dashboard, staff tools, and school
+                services.
               </p>
 
-              <form className="space-y-5">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                    Email address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between gap-3 pt-1">
-                  <label className="flex items-center gap-2 text-sm text-slate-600">
-                    <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-                    Remember me
-                  </label>
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-emerald-700 transition hover:text-emerald-800"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  className="mt-2 h-12 w-full rounded-xl border-0 bg-gradient-to-r from-emerald-600 to-teal-500 text-base font-semibold text-white shadow-[0_14px_30px_rgba(16,185,129,0.35)] transition hover:from-emerald-500 hover:to-teal-400"
+              <LoginForm />
+              <div className="divide-amber-50 h-px mt-6 w-full bg-gray-200" />
+              <div className="mt-5 text-center">
+                <Link
+                  href="/signup"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100"
                 >
-                  Login
-                </button>
-              </form>
-
+                  Sign up for applicants
+                </Link>
+              </div>
               <div className="mt-8 text-center text-sm text-slate-500">
-                Need help? {" "}
-                <a href="#" className="font-medium text-emerald-700 hover:text-emerald-800">
+                Need help?{" "}
+                <a
+                  href="#"
+                  className="font-medium text-emerald-700 hover:text-emerald-800"
+                >
                   Contact support
                 </a>
               </div>
@@ -104,8 +74,8 @@ export default function Home() {
                   Empowering learners and staff
                 </h2>
                 <p className="mt-4 text-sm leading-6 text-emerald-50/90">
-                  Streamlined access to recruitment, promotion tools, and essential school
-                  communication systems in one secure portal.
+                  Streamlined access to recruitment, promotion tools, and
+                  essential school communication systems in one secure portal.
                 </p>
               </div>
             </div>

@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { dashboardNavigation } from "./navigation";
+import { useDashboardAccount } from "./dashboard-account-context";
+import LogoutButton from "./logout-button";
 
 const icons: Record<string, React.ReactNode> = {
   grid: (
@@ -67,6 +69,7 @@ function Icon({ name }: { name: string }) {
 export default function MobileNavigation() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const account = useDashboardAccount();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -127,7 +130,7 @@ export default function MobileNavigation() {
           aria-modal="true"
           aria-label="Main navigation"
           inert={!isOpen}
-          className={`absolute inset-y-0 left-0 flex w-[min(20rem,calc(100%-3rem))] flex-col border-r border-[#e8eeea] bg-white shadow-2xl transition-transform duration-300 ease-out ${
+          className={`h-screen absolute inset-y-0 left-0 flex w-[min(20rem,calc(100%-3rem))] flex-col border-r border-[#e8eeea] bg-white shadow-2xl transition-transform duration-300 ease-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -204,15 +207,25 @@ export default function MobileNavigation() {
                 Applicant identities stay concealed during initial screening.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-3 border-t border-[#edf0ee] px-2 pt-4">
-              <div className="flex size-9 items-center justify-center rounded-full bg-[#dcebe2] text-xs font-bold text-[#286b46]">
-                AD
+            <div className="mt-4 border-t border-[#edf0ee] px-2 pt-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#dcebe2] text-xs font-bold text-[#286b46]">
+                  {account.initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-bold">
+                    {account.displayName}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#84918a]">
+                    {account.roles.join(", ") || "No role assigned"}
+                  </p>
+                  <p className="truncate text-[10px] text-[#84918a]">
+                    {account.email}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-bold">Division Admin</p>
-                <p className="mt-0.5 text-[10px] text-[#84918a]">
-                  Administrator
-                </p>
+              <div className="mt-3" onClick={() => setIsOpen(false)}>
+                <LogoutButton />
               </div>
             </div>
           </div>
