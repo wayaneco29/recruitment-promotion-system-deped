@@ -22,3 +22,12 @@ export const dashboardNavigation = [
   },
   { label: "Audit trail", icon: "clock", href: "/dashboard/audit-trail" },
 ];
+
+const applicantNavigation = [
+  { label: "Profile", icon: "profile", href: "/dashboard/profile" },
+  { label: "Documents", icon: "documents", href: "/dashboard/documents" },
+];
+
+export function getDashboardNavigation(isApplicant: boolean) {
+  return isApplicant ? applicantNavigation : dashboardNavigation;
+}

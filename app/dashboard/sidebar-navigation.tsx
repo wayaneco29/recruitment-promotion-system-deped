@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { dashboardNavigation } from "./navigation";
+import { useDashboardAccount } from "./dashboard-account-context";
+import { getDashboardNavigation } from "./navigation";
 
 const icons: Record<string, React.ReactNode> = {
   grid: (
@@ -44,14 +45,28 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M12 7v5l3 2" />
     </>
   ),
+  profile: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M5 21a7 7 0 0 1 14 0" />
+    </>
+  ),
+  documents: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6M8 13h8M8 17h8" />
+    </>
+  ),
 };
 
 export default function SidebarNavigation() {
   const pathname = usePathname().replace(/\/+$/, "") || "/";
+  const { isApplicant } = useDashboardAccount();
+  const navigation = getDashboardNavigation(isApplicant);
 
   return (
     <nav aria-label="Main navigation" className="mt-3 space-y-1">
-      {dashboardNavigation.map((item) => {
+      {navigation.map((item) => {
         const active =
           item.href === "/dashboard"
             ? pathname === item.href

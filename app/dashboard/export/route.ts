@@ -1,3 +1,5 @@
+import { requireNonApplicant } from "../access";
+
 const rows = [
   ["Section", "Item", "Value", "Status"],
   ["Overview", "Personnel records", "2486", "Preview data"],
@@ -20,7 +22,9 @@ function escapeCsvCell(value: string) {
   return `"${value.replaceAll('"', '""')}"`;
 }
 
-export function GET() {
+export async function GET() {
+  await requireNonApplicant();
+
   const csv = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\r\n");
 
   return new Response(`\uFEFF${csv}`, {

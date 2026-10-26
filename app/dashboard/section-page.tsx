@@ -1,4 +1,5 @@
 import MobileNavigation from "./mobile-navigation";
+import { requireNonApplicant } from "./access";
 
 type SectionPageProps = {
   title: string;
@@ -9,7 +10,7 @@ type SectionPageProps = {
   rows: string[][];
 };
 
-export default function SectionPage({
+export default async function SectionPage({
   title,
   description,
   metrics,
@@ -17,6 +18,8 @@ export default function SectionPage({
   columns,
   rows,
 }: SectionPageProps) {
+  await requireNonApplicant();
+
   return (
     <main className="min-h-screen bg-[#f5f7f6] text-[#172b24]">
       <div className="mx-auto max-w-[1500px] px-5 py-5 sm:px-8 sm:py-7 xl:px-10">

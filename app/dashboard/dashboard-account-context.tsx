@@ -7,6 +7,7 @@ export type DashboardAccount = {
   email: string;
   initials: string;
   roles: string[];
+  isApplicant: boolean;
 };
 
 const DashboardAccountContext = createContext<DashboardAccount | null>(null);

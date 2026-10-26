@@ -146,6 +146,9 @@ export default async function Layout({ children }: React.PropsWithChildren) {
       .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" "),
   );
+  const isApplicant = (userRoles ?? []).some(
+    ({ role }: { role: string }) => role === "applicant",
+  );
   const account: DashboardAccount = {
     displayName,
     email: profile?.email || user.email || "",
@@ -157,6 +160,7 @@ export default async function Layout({ children }: React.PropsWithChildren) {
         .map((part) => part[0]?.toUpperCase() ?? "")
         .join("") || "U",
     roles,
+    isApplicant,
   };
 
   return (

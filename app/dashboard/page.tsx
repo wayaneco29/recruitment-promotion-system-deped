@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MobileNavigation from "./mobile-navigation";
+import { requireNonApplicant } from "./access";
 
 export const metadata: Metadata = {
   title: "Dashboard | DepEd Southern Leyte",
@@ -165,7 +166,9 @@ function Icon({
   );
 }
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  await requireNonApplicant();
+
   return (
     <div className="min-h-screen bg-[#f5f7f6] text-[#172b24]">
       <header className="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-[#e8eeea] bg-white/95 px-5 backdrop-blur sm:px-8 xl:px-10">
