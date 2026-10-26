@@ -3,29 +3,29 @@ export const dashboardNavigation = [
   {
     label: "Personnel records",
     icon: "people",
-    href: "/dashboard/personnel-records",
+    href: "/personnel-records",
   },
   {
     label: "Validation queue",
     icon: "check",
-    href: "/dashboard/validation-queue",
+    href: "/validation-queue",
   },
   {
     label: "Recruitment & promotion",
     icon: "briefcase",
-    href: "/dashboard/recruitment-promotion",
+    href: "/recruitment-promotion",
   },
   {
     label: "Monthly reports",
     icon: "chart",
-    href: "/dashboard/monthly-reports",
+    href: "/monthly-reports",
   },
-  { label: "Audit trail", icon: "clock", href: "/dashboard/audit-trail" },
+  { label: "Audit trail", icon: "clock", href: "/audit-trail" },
 ];
 
 const applicantNavigation = [
-  { label: "Profile", icon: "profile", href: "/dashboard/profile" },
-  { label: "Documents", icon: "documents", href: "/dashboard/documents" },
+  { label: "Profile", icon: "profile", href: "/profile" },
+  { label: "Documents", icon: "documents", href: "/documents" },
 ];
 
 export function getDashboardNavigation(isApplicant: boolean) {

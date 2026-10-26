@@ -7,7 +7,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { updateApplicantProfile } from "@/actions/applicant-profile.action";
-import MobileNavigation from "../mobile-navigation";
+import MobileNavigation from "../../dashboard/mobile-navigation";
+import ApplicantWorkspaceHeader from "../../dashboard/applicant-workspace-header";
 import type { ApplicantProfile, ApplicantProfileUpdate } from "./types";
 
 const sexOptions = ["", "Female", "Male", "Prefer not to say"] as const;
@@ -99,8 +100,10 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 export default function ProfileForm({
   initialProfile,
+  applicantScore,
 }: {
   initialProfile: ApplicantProfile;
+  applicantScore: number | null;
 }) {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
@@ -159,18 +162,11 @@ export default function ProfileForm({
           </span>
         </div>
 
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#528064]">
-            Applicant workspace
-          </p>
-          <h1 className="mt-2 text-[26px] font-bold tracking-[-0.04em] text-[#1b3025] sm:text-[30px]">
-            Profile
-          </h1>
-          <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-[#7c8a82]">
-            Keep your personal and current employment information accurate for
-            your application.
-          </p>
-        </div>
+        <ApplicantWorkspaceHeader
+          title="Profile"
+          description="Keep your personal and current employment information accurate for your application."
+          score={applicantScore}
+        />
 
         <form
           className="mt-7 space-y-5"

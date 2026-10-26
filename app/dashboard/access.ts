@@ -34,7 +34,7 @@ async function hasApplicantRole() {
 
 export async function requireNonApplicant() {
   if (await hasApplicantRole()) {
-    redirect("/dashboard/profile");
+    redirect("/profile");
   }
 }
 

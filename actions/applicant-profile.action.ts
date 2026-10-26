@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { ApplicantProfileUpdate } from "@/app/dashboard/profile/types";
+import type { ApplicantProfileUpdate } from "@/app/(applicant)/profile/types";
 
 type UpdateProfileResult =
   | { success: true }
@@ -94,7 +94,8 @@ export async function updateApplicantProfile(
   if (!user) {
     return {
       success: false,
-      message: "Your session has expired. Sign in again to update your profile.",
+      message:
+        "Your session has expired. Sign in again to update your profile.",
     };
   }
 
@@ -145,7 +146,7 @@ export async function updateApplicantProfile(
     };
   }
 
-  revalidatePath("/dashboard/profile");
+  revalidatePath("/profile");
   revalidatePath("/dashboard");
   return { success: true };
 }

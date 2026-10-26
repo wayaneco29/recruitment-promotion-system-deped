@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { requireApplicant } from "../access";
+import { requireApplicant } from "../../dashboard/access";
+import { getApplicantScore } from "../../dashboard/applicant-score";
 import DocumentsManager, { type ApplicantDocument } from "./documents-manager";
 
 export const metadata: Metadata = {
@@ -23,17 +24,26 @@ export default async function DocumentsPage() {
     throw new Error("Unable to load documents without an authenticated user.");
   }
 
-  const { data: documents, error: documentsError } = await supabase
-    .from("applicant_documents")
-    .select(
-      "id, document_type, custom_document_type, file_name, mime_type, file_size, storage_path, created_at, updated_at",
-    )
-    .eq("applicant_id", user.id)
-    .order("updated_at", { ascending: false });
+  const [{ data: documents, error: documentsError }, applicantScore] =
+    await Promise.all([
+      supabase
+        .from("applicant_documents")
+        .select(
+          "id, document_type, custom_document_type, file_name, mime_type, file_size, storage_path, created_at, updated_at",
+        )
+        .eq("applicant_id", user.id)
+        .order("updated_at", { ascending: false }),
+      getApplicantScore(supabase, user.id),
+    ]);
 
   if (documentsError) {
     throw new Error(`Unable to load your documents: ${documentsError.message}`);
   }
 
-  return <DocumentsManager initialDocuments={documents as ApplicantDocument[]} />;
+  return (
+    <DocumentsManager
+      initialDocuments={documents as ApplicantDocument[]}
+      applicantScore={applicantScore}
+    />
+  );
 }

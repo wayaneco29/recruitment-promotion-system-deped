@@ -2,7 +2,8 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import MobileNavigation from "../mobile-navigation";
+import MobileNavigation from "../../dashboard/mobile-navigation";
+import ApplicantWorkspaceHeader from "../../dashboard/applicant-workspace-header";
 import { createClient } from "@/lib/supabase/client";
 
 const documentTypes = [
@@ -58,16 +59,19 @@ function formatDate(value: string) {
 
 export default function DocumentsManager({
   initialDocuments,
+  applicantScore,
 }: {
   initialDocuments: ApplicantDocument[];
+  applicantScore: number | null;
 }) {
   const router = useRouter();
   const [documents, setDocuments] = useState(initialDocuments);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] =
     useState<ApplicantDocument | null>(null);
-  const [documentType, setDocumentType] =
-    useState<(typeof documentTypes)[number]>("Training / Certificates");
+  const [documentType, setDocumentType] = useState<
+    (typeof documentTypes)[number]
+  >("Training / Certificates");
   const [customType, setCustomType] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pendingUploadId, setPendingUploadId] = useState<string | null>(null);
@@ -106,7 +110,9 @@ export default function DocumentsManager({
     }
 
     if (selectedFile.size === 0 || selectedFile.size > maxFileSize) {
-      setErrorMessage("Files must be larger than 0 bytes and no larger than 10 MB.");
+      setErrorMessage(
+        "Files must be larger than 0 bytes and no larger than 10 MB.",
+      );
       return;
     }
 
@@ -138,10 +144,7 @@ export default function DocumentsManager({
         return;
       }
 
-      const id =
-        editingDocument?.id ??
-        pendingUploadId ??
-        crypto.randomUUID();
+      const id = editingDocument?.id ?? pendingUploadId ?? crypto.randomUUID();
       if (!editingDocument) {
         setPendingUploadId(id);
       }
@@ -228,30 +231,11 @@ export default function DocumentsManager({
           </span>
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#528064]">
-              Applicant workspace
-            </p>
-            <h1 className="mt-2 text-[26px] font-bold tracking-[-0.04em] text-[#1b3025] sm:text-[30px]">
-              Documents
-            </h1>
-            <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-[#7c8a82]">
-              Upload and keep your supporting documents up to date. Only you
-              and authorized reviewers can view these files.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => openUploadModal()}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#24764b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1e633e]"
-          >
-            <span aria-hidden="true" className="text-lg leading-none">
-              +
-            </span>
-            Upload file
-          </button>
-        </div>
+        <ApplicantWorkspaceHeader
+          title="Documents"
+          description="Upload and keep your supporting documents up to date. Only you and authorized reviewers can view these files."
+          score={applicantScore}
+        />
 
         {errorMessage && !isModalOpen && (
           <p
@@ -272,7 +256,17 @@ export default function DocumentsManager({
                 {documents.length} {documents.length === 1 ? "file" : "files"}
                 {" · "}PDF, JPG, PNG, DOC, or DOCX up to 10 MB
               </p>
-            </div>
+            </div>{" "}
+            <button
+              type="button"
+              onClick={() => openUploadModal()}
+              className="inline-flex cursor-pointer shrink-0 items-center justify-center gap-2 rounded-xl bg-[#24764b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1e633e]"
+            >
+              <span aria-hidden="true" className="text-lg leading-none">
+                +
+              </span>
+              Upload file
+            </button>
           </div>
 
           {documents.length === 0 ? (

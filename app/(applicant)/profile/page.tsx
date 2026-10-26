@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { requireApplicant } from "../access";
+import { requireApplicant } from "../../dashboard/access";
+import { getApplicantScore } from "../../dashboard/applicant-score";
 import ProfileForm from "./profile-form";
 import type { ApplicantProfile } from "./types";
 
@@ -21,16 +22,22 @@ export default async function ProfilePage() {
   }
 
   if (!user) {
-    throw new Error("Unable to load your profile without an authenticated user.");
+    throw new Error(
+      "Unable to load your profile without an authenticated user.",
+    );
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("user_profiles")
-    .select(
-      "email, first_name, middle_name, last_name, name_suffix, phone_number, alternate_phone, residential_address, date_of_birth, sex, current_position, current_school_division, employee_number",
-    )
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [{ data: profile, error: profileError }, applicantScore] =
+    await Promise.all([
+      supabase
+        .from("user_profiles")
+        .select(
+          "email, first_name, middle_name, last_name, name_suffix, phone_number, alternate_phone, residential_address, date_of_birth, sex, current_position, current_school_division, employee_number",
+        )
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      getApplicantScore(supabase, user.id),
+    ]);
 
   if (profileError) {
     throw new Error(`Unable to load your profile: ${profileError.message}`);
@@ -61,5 +68,10 @@ export default async function ProfilePage() {
     employee_number: profile?.employee_number ?? "",
   };
 
-  return <ProfileForm initialProfile={initialProfile} />;
+  return (
+    <ProfileForm
+      initialProfile={initialProfile}
+      applicantScore={applicantScore}
+    />
+  );
 }
