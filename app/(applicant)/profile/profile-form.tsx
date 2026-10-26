@@ -7,9 +7,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { updateApplicantProfile } from "@/actions/applicant-profile.action";
-import MobileNavigation from "../../dashboard/mobile-navigation";
-import ApplicantWorkspaceHeader from "../../dashboard/applicant-workspace-header";
-import type { ApplicantRanking } from "../../dashboard/applicant-score";
+import MobileNavigation from "../../(admin)/mobile-navigation";
+import ApplicantWorkspaceHeader from "../../(admin)/applicant-workspace-header";
+import type { ApplicantApplication } from "../../(admin)/applicant-applications";
 import type { ApplicantProfile, ApplicantProfileUpdate } from "./types";
 
 const sexOptions = ["", "Female", "Male", "Prefer not to say"] as const;
@@ -101,10 +101,10 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 export default function ProfileForm({
   initialProfile,
-  applicantRanking,
+  applicantApplications,
 }: {
   initialProfile: ApplicantProfile;
-  applicantRanking: ApplicantRanking;
+  applicantApplications: ApplicantApplication[];
 }) {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
@@ -166,8 +166,7 @@ export default function ProfileForm({
         <ApplicantWorkspaceHeader
           title="Profile"
           description="Keep your personal and current employment information accurate for your application."
-          score={applicantRanking.score}
-          rank={applicantRanking.rank}
+          applications={applicantApplications}
         />
 
         <form

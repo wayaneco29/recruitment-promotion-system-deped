@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import MobileNavigation from "./mobile-navigation";
-import { requireNonApplicant } from "./access";
+import MobileNavigation from "../mobile-navigation";
+import { requireNonApplicant } from "../access";
 
 export const metadata: Metadata = {
   title: "Dashboard | DepEd Southern Leyte",

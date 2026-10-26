@@ -15,6 +15,13 @@ row-level security. Evaluation rules and weights must be configured from the
 approved DepEd policy for each position; the database does not invent scoring
 criteria or make final hiring decisions.
 
+Recruitment administrators can create a hiring position from the Recruitment &
+promotion workspace. Each posting includes its organization, recruitment cycle,
+position title/item number, policy reference, and application dates. Applicants
+can browse positions during their open application period and submit once per
+position from the Applications tab. Active organization units must be configured
+before administrators can publish positions.
+
 To invite and provision the initial super admin, set `SUPABASE_URL` and
 `SUPABASE_SERVICE_ROLE_KEY` in the PowerShell session, then run:
 

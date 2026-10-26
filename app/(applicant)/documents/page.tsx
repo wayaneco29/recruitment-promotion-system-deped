@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { requireApplicant } from "../../dashboard/access";
-import { getApplicantRanking } from "../../dashboard/applicant-score";
+import { requireApplicant } from "../../(admin)/access";
+import { getApplicantApplications } from "../../(admin)/applicant-applications";
 import DocumentsManager, { type ApplicantDocument } from "./documents-manager";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default async function DocumentsPage() {
     throw new Error("Unable to load documents without an authenticated user.");
   }
 
-  const [{ data: documents, error: documentsError }, applicantRanking] =
+  const [{ data: documents, error: documentsError }, applicantApplications] =
     await Promise.all([
       supabase
         .from("applicant_documents")
@@ -33,7 +33,7 @@ export default async function DocumentsPage() {
         )
         .eq("applicant_id", user.id)
         .order("updated_at", { ascending: false }),
-      getApplicantRanking(supabase, user.id),
+      getApplicantApplications(supabase, user.id),
     ]);
 
   if (documentsError) {
@@ -43,7 +43,7 @@ export default async function DocumentsPage() {
   return (
     <DocumentsManager
       initialDocuments={documents as ApplicantDocument[]}
-      applicantRanking={applicantRanking}
+      applicantApplications={applicantApplications}
     />
   );
 }

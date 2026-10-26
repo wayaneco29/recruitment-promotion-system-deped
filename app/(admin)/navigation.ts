@@ -24,6 +24,7 @@ export const dashboardNavigation = [
 ];
 
 const applicantNavigation = [
+  { label: "Applications", icon: "applications", href: "/applications" },
   { label: "Profile", icon: "profile", href: "/profile" },
   { label: "Documents", icon: "documents", href: "/documents" },
 ];

@@ -1,12 +1,12 @@
 import Image from "next/image";
-import SidebarNavigation from "../dashboard/sidebar-navigation";
+import SidebarNavigation from "../(admin)/sidebar-navigation";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import {
   DashboardAccountProvider,
   type DashboardAccount,
-} from "../dashboard/dashboard-account-context";
-import LogoutButton from "../dashboard/logout-button";
+} from "../(admin)/dashboard-account-context";
+import LogoutButton from "../(admin)/logout-button";
 
 export const instant = false;
 

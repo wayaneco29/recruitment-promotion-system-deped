@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { requireApplicant } from "../../dashboard/access";
-import { getApplicantRanking } from "../../dashboard/applicant-score";
+import { requireApplicant } from "../../(admin)/access";
+import { getApplicantApplications } from "../../(admin)/applicant-applications";
 import ProfileForm from "./profile-form";
 import type { ApplicantProfile } from "./types";
 
@@ -27,7 +27,7 @@ export default async function ProfilePage() {
     );
   }
 
-  const [{ data: profile, error: profileError }, applicantRanking] =
+  const [{ data: profile, error: profileError }, applicantApplications] =
     await Promise.all([
       supabase
         .from("user_profiles")
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
         )
         .eq("user_id", user.id)
         .maybeSingle(),
-      getApplicantRanking(supabase, user.id),
+      getApplicantApplications(supabase, user.id),
     ]);
 
   if (profileError) {
@@ -71,7 +71,7 @@ export default async function ProfilePage() {
   return (
     <ProfileForm
       initialProfile={initialProfile}
-      applicantRanking={applicantRanking}
+      applicantApplications={applicantApplications}
     />
   );
 }
