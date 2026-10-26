@@ -6,6 +6,12 @@ export const dashboardNavigation = [
     href: "/personnel-records",
   },
   {
+    label: "Organizations",
+    icon: "organizations",
+    href: "/organizations",
+    superAdminOnly: true,
+  },
+  {
     label: "Validation queue",
     icon: "check",
     href: "/validation-queue",
@@ -29,6 +35,12 @@ const applicantNavigation = [
   { label: "Documents", icon: "documents", href: "/documents" },
 ];
 
-export function getDashboardNavigation(isApplicant: boolean) {
-  return isApplicant ? applicantNavigation : dashboardNavigation;
+export function getDashboardNavigation(
+  isApplicant: boolean,
+  isSuperAdmin = false,
+) {
+  if (isApplicant) return applicantNavigation;
+  return dashboardNavigation.filter(
+    (item) => !("superAdminOnly" in item) || !item.superAdminOnly || isSuperAdmin,
+  );
 }

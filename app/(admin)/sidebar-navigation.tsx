@@ -21,6 +21,12 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
     </>
   ),
+  organizations: (
+    <>
+      <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4" />
+      <path d="M8 9v.01M8 12v.01M8 15v.01M8 18v.01M16 13v.01M16 16v.01M16 19v.01" />
+    </>
+  ),
   check: (
     <>
       <path d="m9 12 2 2 4-4" />
@@ -67,8 +73,11 @@ const icons: Record<string, React.ReactNode> = {
 
 export default function SidebarNavigation() {
   const pathname = usePathname().replace(/\/+$/, "") || "/";
-  const { isApplicant } = useDashboardAccount();
-  const navigation = getDashboardNavigation(isApplicant);
+  const account = useDashboardAccount();
+  const navigation = getDashboardNavigation(
+    account.isApplicant,
+    account.roles.includes("Super Admin"),
+  );
 
   return (
     <nav aria-label="Main navigation" className="mt-3 space-y-1">

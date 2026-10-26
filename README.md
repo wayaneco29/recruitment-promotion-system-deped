@@ -19,8 +19,15 @@ Recruitment administrators can create a hiring position from the Recruitment &
 promotion workspace. Each posting includes its organization, recruitment cycle,
 position title/item number, policy reference, and application dates. Applicants
 can browse positions during their open application period and submit once per
-position from the Applications tab. Active organization units must be configured
-before administrators can publish positions.
+position from the Applications tab. Administrators see an applicant count for
+each position and can select a position to review its applicants in a paginated
+list. Applicant contact details are protected by the database's role and
+organization-scoped row-level security policies. Active organization units
+must be configured before administrators can publish positions.
+
+Super admins can add divisions, districts, and schools from the Organizations
+page. Organization codes must be unique, and a parent can be selected to keep
+districts and schools in the organization hierarchy.
 
 To invite and provision the initial super admin, set `SUPABASE_URL` and
 `SUPABASE_SERVICE_ROLE_KEY` in the PowerShell session, then run:

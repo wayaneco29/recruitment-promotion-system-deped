@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import MobileNavigation from "../mobile-navigation";
@@ -117,10 +118,29 @@ export default async function RecruitmentPromotionPage() {
     );
   }
 
+  const applicantCounts = await Promise.all(
+    positions.map(async (position) => {
+      const { count, error } = await supabase
+        .from("applications")
+        .select("id", { count: "exact", head: true })
+        .eq("position_id", position.id);
+
+      if (error) {
+        throw new Error(
+          `Unable to load applicant count for ${position.title}: ${error.message}`,
+        );
+      }
+
+      return [position.id, count ?? 0] as const;
+    }),
+  );
+
   const cyclesById = new Map(cycles.map((cycle) => [cycle.id, cycle]));
   const unitsById = new Map(
     organizationUnits.map((unit) => [unit.id, unit]),
   );
+  const applicantCountByPositionId = new Map(applicantCounts);
+
   const now = getCurrentTimestamp();
 
   return (
@@ -194,36 +214,51 @@ export default async function RecruitmentPromotionPage() {
                         ? "Open"
                         : "Closed";
                 const unit = unitsById.get(cycle.organization_unit_id);
+                const applicantCount =
+                  applicantCountByPositionId.get(position.id) ?? 0;
 
                 return (
                   <li
                     key={position.id}
-                    className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                    className="px-5 py-4 sm:px-6"
                   >
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-[#304238]">
-                        {position.title}
-                      </h3>
-                      <p className="mt-1 text-xs text-[#859189]">
-                        {position.item_number
-                          ? `Item ${position.item_number} · `
-                          : ""}
-                        {unit?.name ?? "Organization"} · {cycle.name}
-                      </p>
-                      <p className="mt-1 text-[11px] text-[#859189]">
-                        Applications: {formatDate(cycle.starts_at)} –{" "}
-                        {formatEndDate(cycle.ends_at)}
-                      </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-[#304238]">
+                          <Link
+                            href={`/recruitment-promotion/${position.id}`}
+                            className="rounded-sm hover:text-[#26734a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#26734a]"
+                          >
+                            {position.title}
+                          </Link>
+                        </h3>
+                        <p className="mt-1 text-xs text-[#859189]">
+                          {position.item_number
+                            ? `Item ${position.item_number} · `
+                            : ""}
+                          {unit?.name ?? "Organization"} · {cycle.name}
+                        </p>
+                        <p className="mt-1 text-[11px] text-[#859189]">
+                          Applications: {formatDate(cycle.starts_at)} –{" "}
+                          {formatEndDate(cycle.ends_at)}
+                        </p>
+                      </div>
+                      <span
+                        className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold ${
+                          status === "Open"
+                            ? "bg-[#edf6f0] text-[#26734a]"
+                            : "bg-[#f2f4f2] text-[#78867e]"
+                        }`}
+                      >
+                        {status}
+                      </span>
                     </div>
-                    <span
-                      className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold ${
-                        status === "Open"
-                          ? "bg-[#edf6f0] text-[#26734a]"
-                          : "bg-[#f2f4f2] text-[#78867e]"
-                      }`}
-                    >
-                      {status}
-                    </span>
+                    <p className="mt-3 border-t border-[#eef1ef] pt-3 text-xs text-[#718078]">
+                      Applicants:{" "}
+                      <span className="font-bold text-[#304238]">
+                        {applicantCount}
+                      </span>
+                    </p>
                   </li>
                 );
               })}
