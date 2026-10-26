@@ -13,9 +13,7 @@ type SignupResult =
   | { success: true; requiresEmailConfirmation: boolean }
   | { success: false; message: string };
 
-export async function handleSignup(
-  input: SignupParams,
-): Promise<SignupResult> {
+export async function handleSignup(input: SignupParams): Promise<SignupResult> {
   if (
     !input ||
     typeof input.firstName !== "string" ||
