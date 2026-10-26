@@ -9,6 +9,7 @@ import * as yup from "yup";
 import { updateApplicantProfile } from "@/actions/applicant-profile.action";
 import MobileNavigation from "../../dashboard/mobile-navigation";
 import ApplicantWorkspaceHeader from "../../dashboard/applicant-workspace-header";
+import type { ApplicantRanking } from "../../dashboard/applicant-score";
 import type { ApplicantProfile, ApplicantProfileUpdate } from "./types";
 
 const sexOptions = ["", "Female", "Male", "Prefer not to say"] as const;
@@ -100,10 +101,10 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 export default function ProfileForm({
   initialProfile,
-  applicantScore,
+  applicantRanking,
 }: {
   initialProfile: ApplicantProfile;
-  applicantScore: number | null;
+  applicantRanking: ApplicantRanking;
 }) {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage();
@@ -165,7 +166,8 @@ export default function ProfileForm({
         <ApplicantWorkspaceHeader
           title="Profile"
           description="Keep your personal and current employment information accurate for your application."
-          score={applicantScore}
+          score={applicantRanking.score}
+          rank={applicantRanking.rank}
         />
 
         <form

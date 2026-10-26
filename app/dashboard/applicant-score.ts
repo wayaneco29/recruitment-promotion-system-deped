@@ -2,10 +2,15 @@ import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
-export async function getApplicantScore(
+export type ApplicantRanking = {
+  score: number | null;
+  rank: number | null;
+};
+
+export async function getApplicantRanking(
   supabase: SupabaseClient,
   applicantId: string,
-): Promise<number | null> {
+): Promise<ApplicantRanking> {
   const { data: identities, error: identitiesError } = await supabase
     .from("application_identities")
     .select("application_id")
@@ -18,7 +23,7 @@ export async function getApplicantScore(
   }
 
   if (identities.length === 0) {
-    return null;
+    return { score: null, rank: null };
   }
 
   const { data: latestApplication, error: applicationError } = await supabase
@@ -39,27 +44,53 @@ export async function getApplicantScore(
   }
 
   if (!latestApplication) {
-    return null;
+    return { score: null, rank: null };
   }
 
-  const { data: screeningResult, error: scoreError } = await supabase
-    .from("application_screening_results")
-    .select("preliminary_score, completed_score_count")
-    .eq("application_id", latestApplication.id)
-    .maybeSingle();
+  const [
+    { data: screeningResult, error: scoreError },
+    { data: ranking, error: rankingError },
+  ] = await Promise.all([
+    supabase
+      .from("application_screening_results")
+      .select("preliminary_score, completed_score_count")
+      .eq("application_id", latestApplication.id)
+      .maybeSingle(),
+    supabase
+      .from("preliminary_application_rankings")
+      .select("preliminary_rank")
+      .eq("application_id", latestApplication.id)
+      .maybeSingle(),
+  ]);
 
   if (scoreError) {
     throw new Error(`Unable to load your applicant score: ${scoreError.message}`);
   }
 
-  if (
-    !screeningResult ||
-    screeningResult.completed_score_count === 0 ||
-    typeof screeningResult.preliminary_score !== "number" ||
-    !Number.isFinite(screeningResult.preliminary_score)
-  ) {
-    return null;
+  if (rankingError) {
+    throw new Error(`Unable to load your applicant rank: ${rankingError.message}`);
   }
 
-  return screeningResult.preliminary_score;
+  const score =
+    screeningResult &&
+    screeningResult.completed_score_count > 0 &&
+    typeof screeningResult.preliminary_score === "number" &&
+    Number.isFinite(screeningResult.preliminary_score)
+      ? screeningResult.preliminary_score
+      : null;
+  const rank =
+    ranking &&
+    typeof ranking.preliminary_rank === "number" &&
+    Number.isFinite(ranking.preliminary_rank)
+      ? ranking.preliminary_rank
+      : null;
+
+  if (
+    !screeningResult ||
+    score === null
+  ) {
+    return { score: null, rank };
+  }
+
+  return { score, rank };
 }

@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import MobileNavigation from "../../dashboard/mobile-navigation";
 import ApplicantWorkspaceHeader from "../../dashboard/applicant-workspace-header";
+import type { ApplicantRanking } from "../../dashboard/applicant-score";
 import { createClient } from "@/lib/supabase/client";
 
 const documentTypes = [
@@ -59,10 +60,10 @@ function formatDate(value: string) {
 
 export default function DocumentsManager({
   initialDocuments,
-  applicantScore,
+  applicantRanking,
 }: {
   initialDocuments: ApplicantDocument[];
-  applicantScore: number | null;
+  applicantRanking: ApplicantRanking;
 }) {
   const router = useRouter();
   const [documents, setDocuments] = useState(initialDocuments);
@@ -234,7 +235,8 @@ export default function DocumentsManager({
         <ApplicantWorkspaceHeader
           title="Documents"
           description="Upload and keep your supporting documents up to date. Only you and authorized reviewers can view these files."
-          score={applicantScore}
+          score={applicantRanking.score}
+          rank={applicantRanking.rank}
         />
 
         {errorMessage && !isModalOpen && (

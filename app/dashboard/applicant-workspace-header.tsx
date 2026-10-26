@@ -1,13 +1,13 @@
-import type { ReactNode } from "react";
-
 export default function ApplicantWorkspaceHeader({
   title,
   description,
   score,
+  rank,
 }: {
   title: string;
   description: string;
   score: number | null;
+  rank: number | null;
 }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -47,6 +47,22 @@ export default function ApplicantWorkspaceHeader({
             )}
           </p>
           <p className="mt-1 text-[9px] text-[#929e97]">Latest application</p>
+        </div>
+        <div
+          aria-label={
+            rank === null
+              ? "Applicant rank pending"
+              : `Applicant rank ${rank}`
+          }
+          className="rounded-xl border border-[#e4ece6] bg-white px-4 py-2.5"
+        >
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#84918a]">
+            Rank
+          </p>
+          <p className="mt-1 text-base font-bold leading-none text-[#26734a]">
+            {rank === null ? "Pending" : `#${rank}`}
+          </p>
+          <p className="mt-1 text-[9px] text-[#929e97]">By position</p>
         </div>
       </div>
     </div>
